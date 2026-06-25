@@ -6,8 +6,7 @@
 <title>❖ IMPERIO HISPANO ❖</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="https://i.imgur.com/uAWcR1H.png">
-<link rel="apple-touch-icon" href="favicon.png">
-  <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="https://i.imgur.com/uAWcR1H.png">
 <meta name="description" content="Imperio Hispano — Comunidad hispanohablante en Discord. Únete a un espacio minimalista y elegante para jugar, hablar y crecer juntos.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="❖ Imperio Hispano ❖">
@@ -717,11 +716,51 @@
   #bg    { z-index: -1; }
   #trail { z-index: 0; }
 
-  /* CONTROLES DE PARTÍCULAS */
-  .controls {
+  /* WRAPPER FIJO — ancla todo el menú arriba-izquierda */
+  #particleMenuWrapper {
     position: fixed;
-    bottom: 14px;
-    left: 50%;
+    top: 14px;
+    left: 14px;
+    z-index: 200;
+  }
+
+  /* BOTÓN FIJO MENÚ PARTÍCULAS */
+  #particleMenuBtn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.75);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  #particleMenuBtn:hover { border-color: rgba(255,255,255,0.5); }
+  #particleMenuBtn.open  { border-color: rgba(255,255,255,0.6); background: rgba(20,20,20,0.9); }
+  body.light-mode #particleMenuBtn { border-color: rgba(0,0,0,0.15); background: rgba(255,255,255,0.85); }
+  body.light-mode #particleMenuBtn:hover { border-color: rgba(0,0,0,0.4); }
+  body.light-mode #particleMenuBtn.open  { border-color: rgba(0,0,0,0.5); }
+
+  #particleMenuBtn #ctrlMiniCanvas {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  /* CONTROLES DE PARTÍCULAS — panel bocadillo bajo el botón */
+  .controls {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
     background: rgba(0,0,0,0.82);
     border: 1px solid #444;
     border-radius: 999px;
@@ -731,34 +770,35 @@
     gap: 8px;
     font-size: 12px;
     color: #ddd;
-    z-index: 100;
     white-space: nowrap;
     cursor: grab;
     user-select: none;
-    /* Animación suave del ancho al colapsar/expandir */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
     box-sizing: border-box;
-    /* overflow:visible para que los popovers (color, forma, share)
-       puedan salir hacia arriba sin ser recortados */
     overflow: visible;
+    /* Oculto por defecto, fade+slide al abrir */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transform-origin: top left;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .controls.ctrl-open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
   }
   .controls:active { cursor: grabbing; }
 
-  /* controls-inner: el bloque colapsable */
+  /* controls-inner: fila horizontal por defecto */
   .controls-inner {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Animación de ancho con clip */
     max-width: 600px;
     opacity: 1;
     overflow: visible;
     transition: max-width 0.45s cubic-bezier(0.4,0,0.2,1),
                 opacity    0.3s  cubic-bezier(0.4,0,0.2,1);
-  }
-  /* Cuando está minimizado sí clipamos para que no se vean restos */
-  .controls.ctrl-minimized .controls-inner {
-    overflow: hidden;
   }
 
   /* Mini-canvas — siempre visible a la izquierda */
@@ -773,13 +813,11 @@
     cursor: pointer;
     background: transparent;
   }
-  #ctrlMiniCanvas:hover {
-    border-color: rgba(255,255,255,0.55);
-  }
+  #ctrlMiniCanvas:hover { border-color: rgba(255,255,255,0.55); }
   body.light-mode #ctrlMiniCanvas { border-color: rgba(0,0,0,0.2); }
   body.light-mode #ctrlMiniCanvas:hover { border-color: rgba(0,0,0,0.45); }
 
-  /* Botón flecha — siempre al extremo derecho */
+  /* Botón flecha */
   #ctrlCollapseBtn {
     width: 22px;
     height: 22px;
@@ -793,53 +831,31 @@
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
-    /* La flecha rota: expandido = apunta izquierda (<), minimizado = apunta derecha (>) */
     transition: border-color 0.25s ease, color 0.25s ease;
   }
   #ctrlCollapseBtn:hover { border-color: #fff; color: #fff; }
   #ctrlCollapseBtn svg {
     pointer-events: none;
-    /* Expandido: apunta izquierda (<) — sin rotación extra, el polyline ya apunta izq */
-    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
   }
-  /* Minimizado: flecha apunta a la derecha (>) */
-  .controls.ctrl-minimized #ctrlCollapseBtn svg { transform: rotate(180deg); }
-
   body.light-mode #ctrlCollapseBtn { border-color: #ccc; color: #999; }
   body.light-mode #ctrlCollapseBtn:hover { border-color: #111; color: #111; }
 
-  /* ── ESTADO MINIMIZADO ──────────────────────────────────────── */
-  .controls.ctrl-minimized {
-    cursor: default !important;
+  /* ── MODO VERTICAL ─────────────────────────────────────────── */
+  .controls.ctrl-vertical {
+    border-radius: 16px;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  .controls.ctrl-minimized:active { cursor: default !important; }
-  .controls.ctrl-minimized .controls-inner {
-    max-width: 0;
-    opacity: 0;
+  .controls.ctrl-vertical .controls-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
+  /* En vertical la flecha rota 90° */
+  .controls.ctrl-vertical #ctrlCollapseBtn svg { transform: rotate(90deg); }
 
-  /* ── MENÚ DE PARTÍCULAS EN MÓVIL ─────────────────────────── */
-  @media (max-width: 600px) {
-    .controls {
-      cursor: default !important;
-      left: 50% !important;
-      bottom: 14px !important;
-      bottom: max(14px, env(safe-area-inset-bottom)) !important;
-      top: auto !important;
-      transform: translateX(-50%) !important;
-      max-width: calc(100vw - 32px);
-    }
-    .controls:active { cursor: default !important; }
-    /* En móvil, el controls-inner también colapsa cuando no tiene mobile-expanded */
-    .controls:not(.mobile-expanded):not(.ctrl-minimized) .controls-inner {
-      max-width: 0;
-      opacity: 0;
-    }
-    .controls.mobile-expanded:not(.ctrl-minimized) .controls-inner {
-      max-width: 340px;
-      opacity: 1;
-    }
-  }
+
 
   /* ── CHIPS DE ROLES/ESTANDARTES: sin desbordamiento ─────── */
   /* Los contenedores de chips ya tienen flex-wrap:wrap en línea,
@@ -1734,7 +1750,7 @@
   body.presentation-mode #readingBar,
   body.presentation-mode #themeToggleBtn,
   body.presentation-mode #backToTopBtn,
-  body.presentation-mode .controls,
+  body.presentation-mode #particleMenuWrapper,
   body.presentation-mode #cursor {
     display: none !important;
   }
@@ -1986,52 +2002,52 @@
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🟤</span>
-          <span><span class="role role-orange">Labrador</span> — <em style="color:#888;">Niveles 0–1.</em> La base más humilde del Imperio. Trabajadores del campo y origen de toda grandeza.</span>
+          <span><span class="role role-orange">Labrador</span>: <em style="color:#888;">Niveles 0–1.</em> La base más humilde del Imperio. Trabajadores del campo y origen de toda grandeza.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">⚪</span>
-          <span><span class="role role-silver">Plebeyo</span> — <em style="color:#888;">Niveles 2–10.</em> Ciudadanos comunes que comienzan su ascenso social dentro del Imperio.</span>
+          <span><span class="role role-silver">Plebeyo</span>: <em style="color:#888;">Niveles 2–10.</em> Ciudadanos comunes que comienzan su ascenso social dentro del Imperio.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🟡</span>
-          <span><span class="role role-gold">Burgués</span> — <em style="color:#888;">Niveles 11–25.</em> Comerciantes prósperos y habitantes influyentes de las ciudades imperiales.</span>
+          <span><span class="role role-gold">Burgués</span>: <em style="color:#888;">Niveles 11–25.</em> Comerciantes prósperos y habitantes influyentes de las ciudades imperiales.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🔵</span>
-          <span><span class="role role-blue">Hidalgo</span> — <em style="color:#888;">Niveles 26–40.</em> Nobleza menor. Honor, linaje y primeras responsabilidades dentro de la sociedad noble.</span>
+          <span><span class="role role-blue">Hidalgo</span>: <em style="color:#888;">Niveles 26–40.</em> Nobleza menor. Honor, linaje y primeras responsabilidades dentro de la sociedad noble.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🟣</span>
-          <span><span class="role role-purple">Marqués</span> — <em style="color:#888;">Niveles 41–55.</em> Administradores de tierras y guardianes de territorios imperiales.</span>
+          <span><span class="role role-purple">Marqués</span>: <em style="color:#888;">Niveles 41–55.</em> Administradores de tierras y guardianes de territorios imperiales.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🟠</span>
-          <span><span class="role role-cyan">Conde</span> — <em style="color:#888;">Niveles 56–60.</em> Título de prestigio. Voz respetada en el consejo del Imperio.</span>
+          <span><span class="role role-cyan">Conde</span>: <em style="color:#888;">Niveles 56–60.</em> Título de prestigio. Voz respetada en el consejo del Imperio.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🔷</span>
-          <span><span class="role role-teal">Duque</span> — <em style="color:#888;">Niveles 61–70.</em> Alta nobleza. Poder territorial, patrimonio y autoridad consolidada.</span>
+          <span><span class="role role-teal">Duque</span>: <em style="color:#888;">Niveles 61–70.</em> Alta nobleza. Poder territorial, patrimonio y autoridad consolidada.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">🌸</span>
-          <span><span class="role role-pink">Infante</span> — <em style="color:#888;">Niveles 71–80.</em> Miembro de la familia real. Sangre noble y destino elevado.</span>
+          <span><span class="role role-pink">Infante</span>: <em style="color:#888;">Niveles 71–80.</em> Miembro de la familia real. Sangre noble y destino elevado.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <span class="reward-badge">👑</span>
-          <span><span class="role role-yellow">Príncipe</span> — <em style="color:#888;">Niveles 81–90.</em> Heredero directo del trono. La corona observa cada uno de tus pasos.</span>
+          <span><span class="role role-yellow">Príncipe</span>: <em style="color:#888;">Niveles 81–90.</em> Heredero directo del trono. La corona observa cada uno de tus pasos.</span>
         </div>
 
         <div class="reward-item" style="align-items:flex-start;padding:8px 0;">
           <span class="reward-badge">⚜️</span>
-          <span><span class="role role-red">Rey</span> — <em style="color:#888;">Niveles 91–100+.</em> Soberano del Imperio. Tu palabra es ley.</span>
+          <span><span class="role role-red">Rey</span>: <em style="color:#888;">Niveles 91–100+.</em> Soberano del Imperio. Tu palabra es ley.</span>
         </div>
 
       </div>
@@ -2067,11 +2083,11 @@
         <p style="font-size:12px;color:#888;margin-bottom:12px;font-style:italic;">(Saldrás más arriba en la lista de miembros, y sirve para decorar tu perfil.)</p>
         <div class="reward-item">
           <span class="reward-badge">📨</span>
-          <span><span class="role role-silver">Mensajero del Imperio</span> — Consíguelo al invitar a <strong>5 personas</strong>.</span>
+          <span><span class="role role-silver">Mensajero del Imperio</span>: consíguelo al invitar a <strong>5 personas</strong>.</span>
         </div>
         <div class="reward-item">
           <span class="reward-badge">🏛</span>
-          <span><span class="role role-gold">Embajador del Imperio</span> — Consíguelo al invitar a <strong>10 personas</strong>.</span>
+          <span><span class="role role-gold">Embajador del Imperio</span>: consíguelo al invitar a <strong>10 personas</strong>.</span>
         </div>
       </div>
 
@@ -2147,15 +2163,15 @@
         <h4>⚔ RECOMPENSAS POR VOTAR</h4>
         <div class="reward-item">
           <span class="reward-badge">🎖️</span>
-          <span><span class="role role-silver">I. Soldado Imperialista</span> — Reconocimiento básico por tu lealtad al Imperio. <em style="color:#888;">(10 bumps/votos)</em></span>
+          <span><span class="role role-silver">I. Soldado Imperialista</span>: reconocimiento básico por tu lealtad al Imperio. <em style="color:#888;">(10 bumps/votos)</em></span>
         </div>
         <div class="reward-item">
           <span class="reward-badge">🏅</span>
-          <span><span class="role role-gold">II. Centurión</span> — Oficial destacado que demuestra disciplina y constancia. <em style="color:#888;">(25 bumps/votos)</em></span>
+          <span><span class="role role-gold">II. Centurión</span>: oficial destacado que demuestra disciplina y constancia. <em style="color:#888;">(25 bumps/votos)</em></span>
         </div>
         <div class="reward-item">
           <span class="reward-badge">👑</span>
-          <span><span class="role role-purple">III. Legado</span> — La élite del Imperio, para los más leales y dedicados. <em style="color:#888;">(50 bumps/votos)</em></span>
+          <span><span class="role role-purple">III. Legado</span>: la élite del Imperio, para los más leales y dedicados. <em style="color:#888;">(50 bumps/votos)</em></span>
         </div>
       </div>
 
@@ -2176,7 +2192,7 @@
       <hr class="divider">
 
       <div class="vote-why">
-        <p>↬ <span style="color:#fff;font-weight:600;">Booster Imperial</span> — Este rol exclusivo y temporal se concede automáticamente a los ciudadanos que deciden <strong>impulsar el Imperio</strong> con su apoyo.</p>
+        <p>↬ <span style="color:#fff;font-weight:600;">Booster Imperial</span>, un rol exclusivo y temporal se concede automáticamente a los ciudadanos que deciden <strong>impulsar el Imperio</strong> con su apoyo.</p>
         <p style="margin-top:10px;">↬ Su gesto fortalece la comunidad y les otorga los siguientes privilegios únicos:</p>
       </div>
 
@@ -2223,19 +2239,19 @@
       <div class="vote-rewards">
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">⚖️</span>
-          <span><strong style="color:#fff;">Reportar</strong> — Invoca un ticket para denunciar a un ciudadano que haya perturbado la paz del Imperio.</span>
+          <span><strong style="color:#fff;">Reportar</strong>: invoca un ticket para denunciar a un ciudadano que haya perturbado la paz del Imperio.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🏅</span>
-          <span><strong style="color:#fff;">Reclamar</strong> — Solicita un rol que te corresponda o reclama el premio de un sorteo imperial.</span>
+          <span><strong style="color:#fff;">Reclamar</strong>: solicita un rol que te corresponda o reclama el premio de un sorteo imperial.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🤝</span>
-          <span><strong style="color:#fff;">Colaborar</strong> — Abre un ticket si representas a un servidor aliado o una marca y deseas forjar una alianza con el Imperio.</span>
+          <span><strong style="color:#fff;">Colaborar</strong>: abre un ticket si representas a un servidor aliado o una marca y deseas forjar una alianza con el Imperio.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">❓</span>
-          <span><strong style="color:#fff;">Dudas</strong> — Abre un ticket si el canal de soporte no ha resuelto tu inquietud y requieres mayor claridad.</span>
+          <span><strong style="color:#fff;">Dudas</strong>: abre un ticket si el canal de soporte no ha resuelto tu inquietud y requieres mayor claridad.</span>
         </div>
       </div>
 
@@ -2290,7 +2306,7 @@
       <hr class="divider">
 
       <div class="vote-rewards">
-        <h4>🎨 ESTANDARTE — Color de tu nombre</h4>
+        <h4>🎨 ESTANDARTE: color de tu nombre</h4>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">⚫ Negro</span>
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">⚪ Blanco</span>
@@ -2308,7 +2324,7 @@
       <hr class="divider">
 
       <div class="vote-rewards">
-        <h4>⚔️ CONDICIÓN — Género</h4>
+        <h4>⚔️ CONDICIÓN: género</h4>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">👑 Dama</span>
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">🛡️ Caballero</span>
@@ -2319,37 +2335,37 @@
       <hr class="divider">
 
       <div class="vote-rewards">
-        <h4>📣 COMUNICADOS — Pings del Consejo</h4>
+        <h4>📣 COMUNICADOS: pings del consejo</h4>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">📢</span>
-          <span><strong style="color:#fff;">Avisos del Consejo</strong> — Anuncios oficiales del Imperio y noticias relevantes.</span>
+          <span><strong style="color:#fff;">Avisos del Consejo</strong>: anuncios oficiales del Imperio y noticias relevantes.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🎉</span>
-          <span><strong style="color:#fff;">Sorteos Imperiales</strong> — Notificaciones de sorteos y repartos imperiales.</span>
+          <span><strong style="color:#fff;">Sorteos Imperiales</strong>: notificaciones de sorteos y repartos imperiales.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">⚡</span>
-          <span><strong style="color:#fff;">Convocatoria de Actividad</strong> — Se te convocará para reanimar la vida del Imperio cuando sea necesario.</span>
+          <span><strong style="color:#fff;">Convocatoria de Actividad</strong>: serás convocado para reanimar la vida del Imperio cuando sea necesario.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🤝</span>
-          <span><strong style="color:#fff;">Pactos Imperiales</strong> — Avisos sobre alianzas, pactos y colaboraciones con otros dominios.</span>
+          <span><strong style="color:#fff;">Pactos Imperiales</strong>: avisos sobre alianzas, pactos y colaboraciones con otros dominios.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🎨</span>
-          <span><strong style="color:#fff;">Gaceta de Creadores</strong> — Notificaciones cuando un afiliado publique contenido o inicie transmisión.</span>
+          <span><strong style="color:#fff;">Gaceta de Creadores</strong>: notificaciones cuando un afiliado publique contenido o inicie transmisión.</span>
         </div>
         <div class="reward-item" style="align-items:flex-start;">
           <span class="reward-badge">🎁</span>
-          <span><strong style="color:#fff;">Cámara de Obsequios</strong> — Para quienes desean reclamar botín gratuito en nombre del Imperio.</span>
+          <span><strong style="color:#fff;">Cámara de Obsequios</strong>: para quienes desean reclamar botín gratuito en nombre del Imperio.</span>
         </div>
       </div>
 
       <hr class="divider">
 
       <div class="vote-rewards">
-        <h4>🎮 SALONES DE JUEGO — Acceso a canales</h4>
+        <h4>🎮 SALONES DE JUEGO: acceso a canales</h4>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">🥊 Brawlhalla</span>
           <span style="background:rgba(255,255,255,0.07);border:1px solid #333;padding:4px 10px;border-radius:4px;font-size:12px;">⬜ Roblox</span>
@@ -2368,7 +2384,7 @@
 
     </div>
 
-  <div class="section-sep fade"><span>✦</span></div>
+  <div class="section-sep fade"><span>◆</span></div>
 
   <!-- REDES SOCIALES -->
   <div class="section fade">
@@ -2410,7 +2426,7 @@
     </div>
   </div>
 
-  <div class="section-sep fade"><span>✦</span></div>
+  <div class="section-sep fade"><span>◆</span></div>
 
   <!-- FAQ -->
   <div class="faq fade">
@@ -2535,8 +2551,8 @@
         </button>
         <div class="faq-acc-panel">
           <p>El sistema de niveles de Imperio Hispano está gestionado por <strong style="color:#fff;">Noctaly</strong>, el bot oficial de la comunidad. Noctaly registra tu actividad dentro del servidor y te recompensa con <strong style="color:#fff;">puntos de experiencia (EXP)</strong> de dos formas distintas:</p>
-          <p style="margin-top:10px;">↬ <strong style="color:#fff;">Canales de voz</strong> — Por cada minuto que permanezcas activo en un canal de voz, Noctaly te otorga entre <strong style="color:#fff;">1 y 6 EXP</strong> de forma aleatoria.</p>
-          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Canales de texto</strong> — Por cada minuto en el que escribas mensajes, recibes entre <strong style="color:#fff;">6 y 10 EXP</strong> de forma aleatoria. El cooldown es de un minuto entre recompensa y recompensa.</p>
+          <p style="margin-top:10px;">↬ <strong style="color:#fff;">Canales de voz</strong>: por cada minuto que permanezcas activo en un canal de voz, Noctaly te otorga entre <strong style="color:#fff;">1 y 6 EXP</strong> de forma aleatoria.</p>
+          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Canales de texto</strong>: por cada minuto en el que escribas mensajes, recibes entre <strong style="color:#fff;">6 y 10 EXP</strong> de forma aleatoria. El cooldown es de un minuto entre recompensa y recompensa.</p>
           <p style="margin-top:10px;">La aleatoriedad en ambos casos es <strong style="color:#fff;">deliberada</strong>: evita que los ciudadanos puedan calcular y automatizar su progreso, garantizando que el crecimiento refleje participación genuina y no farmeo mecánico. A medida que acumules EXP irás desbloqueando nuevos niveles y las recompensas asociadas a cada uno, visibles en el apartado <strong style="color:#fff;">NIVELES</strong> de esta página.</p>
         </div>
       </div>
@@ -2571,9 +2587,9 @@
         <div class="faq-acc-panel">
           <p>Votar por Imperio Hispano es una de las formas más sencillas de ayudar a que la comunidad crezca. Los votos aumentan la visibilidad del servidor en los listados de Discord, atrayendo nuevos miembros y fomentando más actividad, eventos y alianzas.</p>
           <p style="margin-top:10px;">Puedes votar desde tres plataformas distintas, accesibles en el panel <strong style="color:#fff;">VOTANOS</strong> de esta página:</p>
-          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Discords.com</strong> — se puede votar cada 6 horas.</p>
-          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Disboard</strong> — cada 2 horas usando el comando <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:12px;">/bump</code> directamente en el servidor de Discord.</p>
-          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Discord.me</strong> — también disponible desde el panel.</p>
+          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Discords.com</strong>: se puede votar cada 6 horas.</p>
+          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Disboard</strong>: cada 2 horas usando el comando <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;font-size:12px;">/bump</code> directamente en el servidor de Discord.</p>
+          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Discord.me</strong>: también disponible desde el panel.</p>
           <p style="margin-top:10px;">Cada voto cuenta. Cuantos más ciudadanos voten, más rápido crece el Imperio.</p>
         </div>
       </div>
@@ -2585,9 +2601,9 @@
         </button>
         <div class="faq-acc-panel">
           <p>Al impulsar el servidor con un boost de Discord obtienes automáticamente el rol exclusivo <strong style="color:#fff;">Booster Imperial</strong>, que se mantiene activo mientras dure tu boost y otorga los siguientes privilegios:</p>
-          <p style="margin-top:10px;">↬ <strong style="color:#fff;">Cambiar apodos</strong> — Puedes cambiar tu propio nombre y el de otros ciudadanos dentro del servidor.</p>
-          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Emojis y stickers externos</strong> — Acceso para usar emojis y stickers de otros servidores en tus mensajes.</p>
-          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Rol personalizado</strong> — Derecho a portar un rol con nombre y color a tu elección, dejando tu huella en el Imperio.</p>
+          <p style="margin-top:10px;">↬ <strong style="color:#fff;">Cambiar apodos</strong>: puedes cambiar tu propio nombre y el de otros ciudadanos dentro del servidor.</p>
+          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Emojis y stickers externos</strong>: acceso para usar emojis y stickers de otros servidores en tus mensajes.</p>
+          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Rol personalizado</strong>: derecho a portar un rol con nombre y color a tu elección, dejando tu huella en el Imperio.</p>
           <p style="margin-top:10px;">Puedes consultar todos los detalles en el panel <strong style="color:#fff;">BOOSTER</strong> de esta página. Si tienes dudas, abre un ticket y el equipo de soporte te ayudará.</p>
         </div>
       </div>
@@ -2598,17 +2614,17 @@
           <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="faq-acc-panel">
-          <p>Los miembros estándar <strong style="color:#fff;">no pueden cambiar su propio apodo</strong> dentro del servidor — este permiso está restringido para mantener el orden y evitar suplantaciones.</p>
+          <p>Los miembros estándar <strong style="color:#fff;">no pueden cambiar su propio apodo</strong> dentro del servidor; este permiso está restringido para mantener el orden y evitar suplantaciones.</p>
           <p style="margin-top:10px;">Sin embargo, existen dos formas de hacerlo:</p>
-          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Boost</strong> — Al impulsar el servidor obtienes el rol <strong style="color:#fff;">Booster Imperial</strong>, que incluye el permiso para cambiar tu apodo y el de otros ciudadanos.</p>
-          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Ticket de soporte</strong> — Si necesitas un cambio de apodo y no tienes boost, puedes solicitarlo al staff abriendo un ticket desde el canal correspondiente del servidor.</p>
+          <p style="margin-top:8px;">↬ <strong style="color:#fff;">Boost</strong>: al impulsar el servidor obtienes el rol <strong style="color:#fff;">Booster Imperial</strong>, que incluye el permiso para cambiar tu apodo y el de otros ciudadanos.</p>
+          <p style="margin-top:6px;">↬ <strong style="color:#fff;">Ticket de soporte</strong>: si necesitas un cambio de apodo y no tienes boost, puedes solicitarlo al staff abriendo un ticket desde el canal correspondiente del servidor.</p>
         </div>
       </div>
 
     </div>
   </div>
 
-  <div class="section-sep fade"><span>✦</span></div>
+  <div class="section-sep fade"><span>◆</span></div>
 
   <!-- EASTER EGG BOTÓN -->
   <div class="easter-section fade">
@@ -2644,7 +2660,7 @@
       </a>
     </div>
     <p>© 2025 – 2026 Imperio Hispano &mdash; Todos los derechos reservados</p>
-    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.12</span></p>
+    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.13</span></p>
     <!-- BOTONES FOOTER -->
     <div style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button id="privacyToggleBtn" aria-expanded="false" aria-controls="privacyNote"
@@ -2799,15 +2815,14 @@
             <div class="priv-row"><span class="icon">●</span>Config. de partículas (color, forma, velocidad)</div>
             <div class="priv-row"><span class="icon">●</span>Formas y logros desbloqueados</div>
             <div class="priv-row"><span class="icon">●</span>ID anónimo para sincronizar progreso</div>
-            <div class="priv-row"><span class="icon">●</span>Contador de visitas (sin datos personales)</div>
           </div>
           <div class="priv-col priv-col-no">
             <div class="priv-col-title">✕ LO QUE NUNCA TOCAMOS</div>
-            <div class="priv-row"><span class="icon">○</span>Nombre, email ni datos personales</div>
-            <div class="priv-row"><span class="icon">○</span>Dirección IP ni geolocalización</div>
-            <div class="priv-row"><span class="icon">○</span>Cookies de ningún tipo</div>
-            <div class="priv-row"><span class="icon">○</span>Historial de navegación</div>
-            <div class="priv-row"><span class="icon">○</span>Nada se vende ni se comparte</div>
+            <div class="priv-row"><span class="icon">●</span>Nombre, email ni datos personales</div>
+            <div class="priv-row"><span class="icon">●</span>Dirección IP ni geolocalización</div>
+            <div class="priv-row"><span class="icon">●</span>Cookies de ningún tipo</div>
+            <div class="priv-row"><span class="icon">●</span>Historial de navegación</div>
+            <div class="priv-row"><span class="icon">●</span>Nada se vende ni se comparte</div>
           </div>
         </div>
 
@@ -2830,11 +2845,11 @@
           <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
             <div class="priv-ext-row">
               <span class="priv-ext-badge">FUENTES</span>
-              <span><b>Google Fonts</b> — Se descarga la tipografía Cinzel e Inter. Google recibe tu IP para servir el archivo, igual que con cualquier CDN. No se almacena ningún dato de uso.</span>
+              <span><b>Google Fonts</b>: se descarga la tipografía Cinzel e Inter. Google recibe tu IP para servir el archivo, igual que con cualquier CDN. No se almacena ningún dato de uso.</span>
             </div>
             <div class="priv-ext-row">
               <span class="priv-ext-badge">BASE DE DATOS</span>
-              <span><b>Supabase</b> — Recibe conteos anónimos: pulsaciones globales y términos buscados en el FAQ (sin texto completo, solo la query). Nunca se envía el ID anónimo ni ningún dato personal.</span>
+              <span><b>Supabase</b>: recibe conteos anónimos: pulsaciones globales y términos buscados en el FAQ (sin texto completo, solo la query). Nunca se envía el ID anónimo ni ningún dato personal.</span>
             </div>
           </div>
         </div>
@@ -2866,7 +2881,7 @@
         <div class="priv-note" style="margin-top:10px;">Mantén el botón pulsado hasta que se complete para confirmar.</div>
 
         <!-- Fecha revisión -->
-        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.12</div>
+        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.13</div>
       </div>
 
       <script>
@@ -3218,9 +3233,9 @@
           <div>
             <div style="font-size:9px;letter-spacing:1.5px;color:#444;font-family:'Inter',sans-serif;text-transform:uppercase;margin-bottom:8px;">Prioridad</div>
             <div style="display:flex;flex-direction:column;gap:6px;">
-              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#ff6b6b;box-shadow:0 0 4px rgba(255,107,107,0.5)"></div> Alta — bug crítico.</div>
-              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#ffd93d;box-shadow:0 0 4px rgba(255,217,61,0.4)"></div> Media — mejora funcional.</div>
-              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#6bcb77;box-shadow:0 0 4px rgba(107,203,119,0.4)"></div> Baja — detalle visual.</div>
+              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#ff6b6b;box-shadow:0 0 4px rgba(255,107,107,0.5)"></div> Alta: bug crítico.</div>
+              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#ffd93d;box-shadow:0 0 4px rgba(255,217,61,0.4)"></div> Media: mejora funcional.</div>
+              <div class="cl-legend-item"><div class="cl-legend-dot" style="background:#6bcb77;box-shadow:0 0 4px rgba(107,203,119,0.4)"></div> Baja: detalle visual.</div>
             </div>
           </div>
           <div style="background:#1a1a1a;"></div>
@@ -3252,18 +3267,36 @@
         <!-- Timeline -->
         <div class="cl-timeline">
 
-          <!-- 24 JUN 2026 — v1.12 -->
+          <!-- 25 JUN 2026 — v1.13 -->
           <div class="cl-day">
             <div class="cl-day-header">
               <div class="cl-day-dot" id="cl-latest-dot"></div>
-              <span class="cl-day-label">24 JUN 2026</span>
-              <span class="cl-version-tag">v1.12</span>
+              <span class="cl-day-label">25 JUN 2026</span>
+              <span class="cl-version-tag">v1.13</span>
               <span id="cl-new-badge-auto"></span>
-              <span class="cl-day-count">1 cambio</span>
+              <span class="cl-day-count">5 cambios</span>
               <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
             </div>
             <div class="cl-day-body">
-              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">Deploy</span><span class="cl-text">La página web está oficialmente <strong>hosteada y en línea</strong>: <a href="https://imperiohispanodiscord.github.io" target="_blank" rel="noopener noreferrer" style="color:#aaa;">imperiohispanodiscord.github.io</a>. Alojada en GitHub Pages, rama <code>main</code>, con HTTPS activado.</span></div>
+              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">UI</span><span class="cl-text">Menú de partículas rediseñado: eliminada la barra fija inferior. Ahora un botón circular fijo arriba a la izquierda muestra la partícula activa como icono y despliega el menú justo debajo al pulsarlo, con animación de fade. La flecha interior alterna entre disposición horizontal y vertical para no tapar contenido.</span></div>
+              <div class="cl-item"><div class="cl-dot medium"></div><span class="cl-badge content">Content</span><span class="cl-text">Eliminados todos los guiones largos (—) del contenido visible de la página, sustituidos por dos puntos o comas según el contexto. Afecta a roles, niveles, comunicados, tickets, permisos, privacidad y leyenda del changelog.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge css">CSS</span><span class="cl-text">Favicon actualizado: sustituida la referencia externa a Imgur por un archivo local <code>favicon.png</code>. Añadida etiqueta <code>&lt;link rel="icon"&gt;</code> junto a la de <code>apple-touch-icon</code> existente.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Panel de Privacidad: iconos de la columna «LO QUE NUNCA TOCAMOS» cambiados de <code>○</code> a <code>●</code> para ser consistentes con la columna verde. Eliminado el punto «Contador de visitas (sin datos personales)» de la columna verde por ser un contador global, no un dato personal guardado.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge ui">UI</span><span class="cl-text">Separadores de sección: símbolo <code>✦</code> sustituido por <code>◆</code> para evitar confusión con el logo de Gemini (IA de Google).</span></div>
+            </div>
+          </div>
+
+          <!-- 24 JUN 2026 — v1.12 -->
+          <div class="cl-day collapsed">
+            <div class="cl-day-header">
+              <div class="cl-day-dot"></div>
+              <span class="cl-day-label">24 JUN 2026</span>
+              <span class="cl-version-tag">v1.12</span>
+              <span class="cl-day-count">1 cambio</span>
+              <button class="cl-collapse-btn" aria-label="Expandir día">▾</button>
+            </div>
+            <div class="cl-day-body">
+              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge deploy">Deploy</span><span class="cl-text">Página web hosteada en GitHub Pages: <a href="https://imperiohispanodiscord.github.io" target="_blank" rel="noopener noreferrer" style="color:#aaa;">imperiohispanodiscord.github.io</a>. HTTPS activado, rama <code>main</code>, favicon local incluido.</span></div>
             </div>
           </div>
 
@@ -3826,12 +3859,15 @@
 
 </div><!-- /container -->
 
-<!-- CONTROLES DE PARTÍCULAS -->
-<div class="controls" id="controls">
-  <!-- MINI-CANVAS (visible siempre, muestra la partícula actual) -->
-  <canvas id="ctrlMiniCanvas" width="28" height="28" title="Partículas"></canvas>
-  <div class="controls-inner">
-    <!-- DENSIDAD -->
+<!-- MENÚ PARTÍCULAS: wrapper fijo arriba-izquierda -->
+<div id="particleMenuWrapper">
+  <button id="particleMenuBtn" title="Ajustes de partículas" aria-label="Abrir menú de partículas" aria-expanded="false">
+    <canvas id="ctrlMiniCanvas" width="28" height="28"></canvas>
+  </button>
+
+  <!-- CONTROLES DE PARTÍCULAS -->
+  <div class="controls" id="controls">
+    <div class="controls-inner">
     <div style="display:flex;align-items:center;flex-shrink:0;">
       <div id="densityWrapper" style="display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width 0.35s ease,opacity 0.3s ease;">
         <label for="density" style="font-size:11px;color:#aaa;white-space:nowrap;">Partículas</label>
@@ -4092,6 +4128,7 @@
     </svg>
   </button>
 </div>
+</div><!-- /particleMenuWrapper -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -5374,75 +5411,6 @@
     window.__showMilestone = showMilestone;
   })();
 
-  // ── CONTROLES ARRASTRABLES + COLAPSAR ──────────────────────
-  (function() {
-    const ctrl = document.getElementById('controls');
-    let dragging = false;
-    let ox = 0, oy = 0;
-
-    function vpW() { return window.visualViewport ? window.visualViewport.width  : window.innerWidth;  }
-    function vpH() { return window.visualViewport ? window.visualViewport.height : window.innerHeight; }
-
-    // Clamp: mantiene el menú siempre dentro del viewport visible
-    function clampCtrl() {
-      if (window.innerWidth <= 600) return; // en móvil lo maneja CSS
-      const vw = vpW(), vh = vpH();
-      const cw = ctrl.offsetWidth, ch = ctrl.offsetHeight;
-      // Si está usando 'bottom', convertir a 'top' absoluto para poder clampear
-      if (ctrl.style.bottom && ctrl.style.bottom !== 'auto') {
-        ctrl.style.top    = (vh - ch - 14) + 'px';
-        ctrl.style.bottom = 'auto';
-      }
-      let nx = parseFloat(ctrl.style.left) || 0;
-      let ny = parseFloat(ctrl.style.top)  || 0;
-      nx = Math.max(0, Math.min(vw - cw, nx));
-      ny = Math.max(0, Math.min(vh - ch, ny));
-      ctrl.style.left = nx + 'px';
-      ctrl.style.top  = ny + 'px';
-    }
-
-    // Posición inicial centrada abajo (solo en escritorio)
-    if (window.innerWidth > 600) {
-      ctrl.style.transform = 'none';
-      ctrl.style.bottom    = 'auto';
-      ctrl.style.left      = (vpW() / 2 - ctrl.offsetWidth / 2) + 'px';
-      ctrl.style.top       = (vpH() - ctrl.offsetHeight - 14) + 'px';
-    }
-
-    // Al redimensionar o hacer zoom, reclampear para que no salga de pantalla
-    function onViewportChange() { clampCtrl(); }
-    window.addEventListener('resize', onViewportChange);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', onViewportChange);
-      window.visualViewport.addEventListener('scroll', onViewportChange);
-    }
-
-    ctrl.addEventListener('mousedown', (e) => {
-      if (window.innerWidth <= 600) return; // sin arrastre en móvil
-      if (ctrl.classList.contains('ctrl-minimized')) return; // sin arrastre cuando está minimizado
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'LABEL' || e.target.tagName === 'CANVAS') return;
-      dragging = true;
-      const rect = ctrl.getBoundingClientRect();
-      ox = e.clientX - rect.left;
-      oy = e.clientY - rect.top;
-      ctrl.style.bottom = 'auto';
-      ctrl.style.top = rect.top + 'px';
-      ctrl.style.transform = 'none';
-      e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
-      let nx = e.clientX - ox;
-      let ny = e.clientY - oy;
-      nx = Math.max(0, Math.min(vpW() - ctrl.offsetWidth,  nx));
-      ny = Math.max(0, Math.min(vpH() - ctrl.offsetHeight, ny));
-      ctrl.style.left = nx + 'px';
-      ctrl.style.top  = ny + 'px';
-    });
-
-    document.addEventListener('mouseup', () => { dragging = false; });
-  })();
 
   // ── PANELES DESPLEGABLES ────────────────────────────────────
   // Mapa unificado: una sola fuente de verdad para toggle + analytics.
@@ -6831,38 +6799,6 @@
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  GUARDAR POSICIÓN DEL MENÚ DE PARTÍCULAS
-  // ══════════════════════════════════════════════════════════════
-
-  const POS_KEY = 'ih_controls_pos';
-  const ctrl    = document.getElementById('controls');
-
-  window.addEventListener('load', () => {
-    if (!ctrl) return;
-    const saved = localStorage.getItem(POS_KEY);
-    if (!saved) return;
-    try {
-      const { left, top } = JSON.parse(saved);
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const cw = ctrl.offsetWidth  || 300;
-      const ch = ctrl.offsetHeight || 44;
-      ctrl.style.left      = Math.max(0, Math.min(vw - cw, left)) + 'px';
-      ctrl.style.top       = Math.max(0, Math.min(vh - ch, top))  + 'px';
-      ctrl.style.bottom    = 'auto';
-      ctrl.style.transform = 'none';
-    } catch (e) { console.warn('[IH] posición de menú inválida:', e); }
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (!ctrl) return;
-    const left = parseFloat(ctrl.style.left);
-    const top  = parseFloat(ctrl.style.top);
-    if (!isNaN(left) && !isNaN(top)) {
-      localStorage.setItem(POS_KEY, JSON.stringify({ left, top }));
-    }
-  });
-
-  // ══════════════════════════════════════════════════════════════
   //  BOTÓN VOLVER ARRIBA
   // ══════════════════════════════════════════════════════════════
 
@@ -6916,294 +6852,83 @@
   });
 
   // ══════════════════════════════════════════════════════════════
-  //  MENÚ DE PARTÍCULAS COLAPSABLE EN MÓVIL
+  //  MENÚ DE PARTÍCULAS — botón fijo, toggle con fade
   // ══════════════════════════════════════════════════════════════
-
-  const iconLabel = document.getElementById('ctrlMiniCanvas');
-  if (ctrl && iconLabel) {
-    const isMobile = () => window.innerWidth <= 600;
-
-    iconLabel.addEventListener('click', (e) => {
-      if (!isMobile()) return;
-      if (ctrl.classList.contains('ctrl-minimized')) return; // el expand lo maneja el IIFE de colapso
-      e.stopPropagation();
-      const expanded = ctrl.classList.toggle('mobile-expanded');
-      if (!expanded) {
-        window.__particlePopovers?.forEach(h => { if (h?.close) h.close(); });
-        window.__sliderControls?.forEach(fn => { try { fn(); } catch (err) {} });
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!isMobile() || ctrl.contains(e.target)) return;
-      ctrl.classList.remove('mobile-expanded');
-    });
-
-    window.addEventListener('resize', () => {
-      if (!isMobile()) {
-        ctrl.classList.remove('mobile-expanded');
-        ctrl.style.transform = 'none';
-      } else {
-        Object.assign(ctrl.style, { left: '50%', top: 'auto', bottom: '14px', transform: 'translateX(-50%)' });
-      }
-    });
-
-    if (isMobile()) {
-      Object.assign(ctrl.style, { left: '50%', top: 'auto', bottom: '14px', transform: 'translateX(-50%)' });
-    }
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  //  COLAPSAR / EXPANDIR MENÚ DE PARTÍCULAS
-  // ══════════════════════════════════════════════════════════════
-
   (function() {
-    const ctrlEl      = document.getElementById('controls');
-    const collapseBtn = document.getElementById('ctrlCollapseBtn');
-    const miniCanvas  = document.getElementById('ctrlMiniCanvas');
-    if (!ctrlEl || !collapseBtn || !miniCanvas) return;
+    const menuBtn    = document.getElementById('particleMenuBtn');
+    const ctrlEl     = document.getElementById('controls');
+    const miniCanvas = document.getElementById('ctrlMiniCanvas');
+    if (!menuBtn || !ctrlEl || !miniCanvas) return;
 
-    const MINI_KEY = 'ih_ctrl_minimized';
     const mCtx = miniCanvas.getContext('2d');
-    let miniRafId = null;
 
-    // ── Dibujar la partícula actual en el mini-canvas ─────────────
-    // Replica exacta de drawShape() pero escalada al tamaño del mini-canvas
     function drawMini() {
       const W = miniCanvas.width, H = miniCanvas.height;
       mCtx.clearRect(0, 0, W, H);
       const { r, g, b } = window.particleColor || { r:255, g:255, b:255 };
       const op = (typeof window.particleOpacity !== 'undefined') ? window.particleOpacity : 1;
       const shape = (typeof window.particleShape !== 'undefined') ? window.particleShape : 'circle';
-      const s = 6; // radio base para el mini
-
+      const s = 6;
       mCtx.save();
-      mCtx.translate(W / 2, H / 2);
+      mCtx.translate(W/2, H/2);
       mCtx.fillStyle   = `rgba(${r},${g},${b},${op})`;
       mCtx.strokeStyle = `rgba(${r},${g},${b},${op})`;
-
-      // Halo suave
-      const grd = mCtx.createRadialGradient(0, 0, 0, 0, 0, s * 2.2);
-      grd.addColorStop(0, `rgba(${r},${g},${b},${op * 0.35})`);
+      const grd = mCtx.createRadialGradient(0,0,0,0,0,s*2.2);
+      grd.addColorStop(0, `rgba(${r},${g},${b},${op*0.35})`);
       grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      mCtx.beginPath(); mCtx.arc(0, 0, s * 2.2, 0, Math.PI * 2);
+      mCtx.beginPath(); mCtx.arc(0,0,s*2.2,0,Math.PI*2);
       mCtx.fillStyle = grd; mCtx.fill();
       mCtx.fillStyle   = `rgba(${r},${g},${b},${op})`;
       mCtx.strokeStyle = `rgba(${r},${g},${b},${op})`;
-
-      if (shape === 'circle') {
-        mCtx.beginPath(); mCtx.arc(0, 0, s * 0.9, 0, Math.PI * 2); mCtx.fill();
-
-      } else if (shape === 'ring') {
-        mCtx.beginPath(); mCtx.arc(0, 0, s * 1.2, 0, Math.PI * 2);
-        mCtx.lineWidth = s * 0.5; mCtx.stroke();
-
-      } else if (shape === 'cross') {
-        const t = s * 0.35, l = s * 1.4;
-        mCtx.fillRect(-l, -t, l*2, t*2);
-        mCtx.fillRect(-t, -l, t*2, l*2);
-
-      } else if (shape === 'diamond') {
-        mCtx.beginPath();
-        mCtx.moveTo(0, -s*1.4); mCtx.lineTo(s*0.8, 0);
-        mCtx.lineTo(0, s*1.4);  mCtx.lineTo(-s*0.8, 0);
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'star') {
-        mCtx.beginPath();
-        for (let i = 0; i < 5; i++) {
-          const a1 = (i * 4 * Math.PI / 5) - Math.PI/2;
-          const a2 = ((i * 4 + 2) * Math.PI / 5) - Math.PI/2;
-          mCtx[i===0?'moveTo':'lineTo'](Math.cos(a1)*s*1.4, Math.sin(a1)*s*1.4);
-          mCtx.lineTo(Math.cos(a2)*s*0.6, Math.sin(a2)*s*0.6);
-        }
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'triangle') {
-        mCtx.beginPath();
-        mCtx.moveTo(0, -s*1.4); mCtx.lineTo(s*1.2, s*1.0); mCtx.lineTo(-s*1.2, s*1.0);
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'pentagon') {
-        mCtx.beginPath();
-        for (let i = 0; i < 5; i++) {
-          const a = (i * 2 * Math.PI / 5) - Math.PI / 2;
-          mCtx[i===0?'moveTo':'lineTo'](Math.cos(a)*s*1.4, Math.sin(a)*s*1.4);
-        }
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'sparkle') {
-        mCtx.beginPath();
-        for (let i = 0; i < 8; i++) {
-          const a = (i * Math.PI / 4) - Math.PI/8;
-          const r2 = i % 2 === 0 ? s*1.6 : s*0.5;
-          mCtx[i===0?'moveTo':'lineTo'](Math.cos(a)*r2, Math.sin(a)*r2);
-        }
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'comet') {
-        mCtx.beginPath();
-        mCtx.ellipse(0, 0, s*2.2, s*0.5, 0, 0, Math.PI*2);
-        mCtx.fill();
-        const tail = mCtx.createLinearGradient(-s*2.2, 0, -s*4, 0);
-        tail.addColorStop(0, `rgba(${r},${g},${b},${op})`);
-        tail.addColorStop(1, `rgba(${r},${g},${b},0)`);
-        mCtx.fillStyle = tail;
-        mCtx.fillRect(-s*4, -s*0.3, s*2, s*0.6);
-
-      } else if (shape === 'snowflake') {
-        mCtx.lineWidth = s * 0.4;
-        for (let i = 0; i < 6; i++) {
-          mCtx.save(); mCtx.rotate(i * Math.PI / 3);
-          mCtx.beginPath(); mCtx.moveTo(0,0); mCtx.lineTo(0, -s*1.6); mCtx.stroke();
-          mCtx.beginPath(); mCtx.moveTo(0, -s*0.9); mCtx.lineTo(s*0.5, -s*1.3); mCtx.stroke();
-          mCtx.beginPath(); mCtx.moveTo(0, -s*0.9); mCtx.lineTo(-s*0.5, -s*1.3); mCtx.stroke();
-          mCtx.restore();
-        }
-
-      } else if (shape === 'crown') {
-        mCtx.beginPath();
-        mCtx.moveTo(-s*1.3, s*0.8); mCtx.lineTo(-s*1.3, -s*0.4);
-        mCtx.lineTo(-s*0.6, s*0.3); mCtx.lineTo(0, -s*1.2);
-        mCtx.lineTo(s*0.6, s*0.3);  mCtx.lineTo(s*1.3, -s*0.4);
-        mCtx.lineTo(s*1.3, s*0.8);
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'pulse1') {
-        const spikes = 6, outer = s*1.4, inner = s*0.55;
-        mCtx.beginPath();
-        for (let i = 0; i < spikes*2; i++) {
-          const r2 = i%2===0 ? outer : inner;
-          const ang = (i*Math.PI)/spikes - Math.PI/2;
-          mCtx[i===0?'moveTo':'lineTo'](Math.cos(ang)*r2, Math.sin(ang)*r2);
-        }
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'imperial') {
-        for (let i = 0; i < 8; i++) {
-          const ang = (i/8)*Math.PI*2;
-          mCtx.beginPath();
-          mCtx.arc(Math.cos(ang)*s*0.7, Math.sin(ang)*s*0.7, s*0.55, 0, Math.PI*2);
-          mCtx.fill();
-        }
-        mCtx.beginPath(); mCtx.arc(0,0,s*0.4,0,Math.PI*2); mCtx.fill();
-
-      } else if (shape === 'note') {
-        mCtx.beginPath(); mCtx.arc(0, s*0.6, s*0.55, 0, Math.PI*2); mCtx.fill();
-        mCtx.fillRect(s*0.5, -s*1.1, s*0.28, s*1.7);
-        mCtx.beginPath();
-        mCtx.moveTo(s*0.5,-s*1.1); mCtx.lineTo(s*1.4,-s*0.7);
-        mCtx.lineTo(s*1.4,-s*0.3); mCtx.lineTo(s*0.5,-s*0.6);
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'times') {
-        const t = s*0.32, l = s*1.2;
-        mCtx.save(); mCtx.rotate(Math.PI/4);
-        mCtx.fillRect(-t,-l,t*2,l*2); mCtx.fillRect(-l,-t,l*2,t*2);
-        mCtx.restore();
-
-      } else if (shape === 'phoenix') {
-        mCtx.font = `${s*2.6}px serif`;
-        mCtx.textAlign = 'center'; mCtx.textBaseline = 'middle';
-        mCtx.fillText('⁂', 0, 0);
-
-      } else if (shape === 'cruz') {
-        const arm = s*1.3, t = s*0.38, notch = s*0.22;
-        // horizontal izq
-        mCtx.beginPath();
-        mCtx.moveTo(-arm,-t); mCtx.lineTo(-t-notch,-t); mCtx.lineTo(-t,0);
-        mCtx.lineTo(-t-notch,t); mCtx.lineTo(-arm,t); mCtx.lineTo(-arm+notch,0);
-        mCtx.closePath(); mCtx.fill();
-        // horizontal der
-        mCtx.beginPath();
-        mCtx.moveTo(arm,-t); mCtx.lineTo(t+notch,-t); mCtx.lineTo(t,0);
-        mCtx.lineTo(t+notch,t); mCtx.lineTo(arm,t); mCtx.lineTo(arm-notch,0);
-        mCtx.closePath(); mCtx.fill();
-        // vertical arriba
-        mCtx.beginPath();
-        mCtx.moveTo(-t,-arm); mCtx.lineTo(-t,-t-notch); mCtx.lineTo(0,-t);
-        mCtx.lineTo(t,-t-notch); mCtx.lineTo(t,-arm); mCtx.lineTo(0,-arm+notch);
-        mCtx.closePath(); mCtx.fill();
-        // vertical abajo
-        mCtx.beginPath();
-        mCtx.moveTo(-t,arm); mCtx.lineTo(-t,t+notch); mCtx.lineTo(0,t);
-        mCtx.lineTo(t,t+notch); mCtx.lineTo(t,arm); mCtx.lineTo(0,arm-notch);
-        mCtx.closePath(); mCtx.fill();
-        mCtx.beginPath(); mCtx.rect(-t,-t,t*2,t*2); mCtx.fill();
-
-      } else if (shape === 'hourglass') {
-        const h2 = s*1.4, w2 = s*1.1, neck = s*0.18;
-        mCtx.beginPath();
-        mCtx.moveTo(-w2,-h2); mCtx.lineTo(w2,-h2); mCtx.lineTo(neck,0);
-        mCtx.lineTo(w2,h2);  mCtx.lineTo(-w2,h2); mCtx.lineTo(-neck,0);
-        mCtx.closePath(); mCtx.fill();
-
-      } else if (shape === 'rick') {
-        mCtx.beginPath();
-        mCtx.moveTo(-s*0.9,-s*1.3); mCtx.lineTo(s*1.3,0); mCtx.lineTo(-s*0.9,s*1.3);
-        mCtx.closePath(); mCtx.fill();
-
-      } else {
-        // fallback: círculo
-        mCtx.beginPath(); mCtx.arc(0,0,s*0.9,0,Math.PI*2); mCtx.fill();
-      }
-
+      if (shape==='circle')      { mCtx.beginPath(); mCtx.arc(0,0,s*0.9,0,Math.PI*2); mCtx.fill(); }
+      else if (shape==='ring')   { mCtx.beginPath(); mCtx.arc(0,0,s*1.2,0,Math.PI*2); mCtx.lineWidth=s*0.5; mCtx.stroke(); }
+      else if (shape==='cross')  { const t=s*0.35,l=s*1.4; mCtx.fillRect(-l,-t,l*2,t*2); mCtx.fillRect(-t,-l,t*2,l*2); }
+      else if (shape==='diamond'){ mCtx.beginPath(); mCtx.moveTo(0,-s*1.4); mCtx.lineTo(s*0.8,0); mCtx.lineTo(0,s*1.4); mCtx.lineTo(-s*0.8,0); mCtx.closePath(); mCtx.fill(); }
+      else if (shape==='star')   { mCtx.beginPath(); for(let i=0;i<5;i++){const a1=(i*4*Math.PI/5)-Math.PI/2,a2=((i*4+2)*Math.PI/5)-Math.PI/2; mCtx[i===0?'moveTo':'lineTo'](Math.cos(a1)*s*1.4,Math.sin(a1)*s*1.4); mCtx.lineTo(Math.cos(a2)*s*0.6,Math.sin(a2)*s*0.6);} mCtx.closePath(); mCtx.fill(); }
+      else if (shape==='triangle'){ mCtx.beginPath(); mCtx.moveTo(0,-s*1.4); mCtx.lineTo(s*1.2,s*1.0); mCtx.lineTo(-s*1.2,s*1.0); mCtx.closePath(); mCtx.fill(); }
+      else { mCtx.beginPath(); mCtx.arc(0,0,s*0.9,0,Math.PI*2); mCtx.fill(); }
       mCtx.restore();
-
-      // Borde y brillo del mini-canvas refleja el color de la partícula
-      miniCanvas.style.borderColor = `rgba(${r},${g},${b},0.5)`;
-      miniCanvas.style.boxShadow   = `0 0 7px rgba(${r},${g},${b},0.35)`;
+      menuBtn.style.borderColor = `rgba(${r},${g},${b},0.45)`;
+      menuBtn.style.boxShadow   = `0 0 10px rgba(${r},${g},${b},0.18)`;
     }
 
-    // Loop del mini-canvas (corre siempre para reflejar cambios en tiempo real)
-    function miniLoop() {
-      drawMini();
-      miniRafId = requestAnimationFrame(miniLoop);
-    }
-    function stopMiniLoop() {
-      if (miniRafId) { cancelAnimationFrame(miniRafId); miniRafId = null; }
-    }
+    (function miniLoop(){ drawMini(); requestAnimationFrame(miniLoop); })();
 
-    // ── Aplicar estado minimizado ────────────────────────────────
-    function applyMinimized(minimized, save) {
-      if (minimized) {
-        ctrlEl.classList.add('ctrl-minimized');
-        collapseBtn.setAttribute('title', 'Expandir menú');
-        collapseBtn.setAttribute('aria-label', 'Expandir menú de partículas');
-        // Cerrar sliders y popovers antes de colapsar
-        window.__sliderControls?.forEach(fn => { try { fn(); } catch(e) {} });
-        window.__particlePopovers?.forEach(h => { if (h?.close) h.close(); });
-      } else {
-        ctrlEl.classList.remove('ctrl-minimized');
-        collapseBtn.setAttribute('title', 'Minimizar menú');
-        collapseBtn.setAttribute('aria-label', 'Minimizar menú de partículas');
-      }
-      if (save) {
-        try { localStorage.setItem(MINI_KEY, minimized ? '1' : '0'); } catch(e) {}
-      }
+    function openMenu() {
+      ctrlEl.classList.add('ctrl-open');
+      menuBtn.classList.add('open');
+      menuBtn.setAttribute('aria-expanded','true');
+    }
+    function closeMenu() {
+      ctrlEl.classList.remove('ctrl-open');
+      menuBtn.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded','false');
+      window.__particlePopovers?.forEach(h => { if(h?.close) h.close(); });
+      window.__sliderControls?.forEach(fn => { try{ fn(); }catch(e){} });
     }
 
-    // Siempre correr el mini loop (muestra la partícula aunque esté expandido)
-    miniLoop();
-
-    // ── Restaurar estado guardado ────────────────────────────────
-    const saved = localStorage.getItem(MINI_KEY);
-    applyMinimized(saved === '1', false);
-
-    // ── Toggle al hacer clic en el botón ────────────────────────
-    collapseBtn.addEventListener('click', (e) => {
+    menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      applyMinimized(!ctrlEl.classList.contains('ctrl-minimized'), true);
+      ctrlEl.classList.contains('ctrl-open') ? closeMenu() : openMenu();
     });
 
-    // Click en el mini-canvas expande si está minimizado
-    miniCanvas.addEventListener('click', (e) => {
-      if (!ctrlEl.classList.contains('ctrl-minimized')) return;
-      e.stopPropagation();
-      applyMinimized(false, true);
+    document.addEventListener('click', (e) => {
+      if (!ctrlEl.contains(e.target) && e.target !== menuBtn) closeMenu();
     });
 
-    // Exponer para hooks externos (applyColor, setShape, applyConfig)
+    // Botón flecha — alterna horizontal / vertical
+    const collapseBtn = document.getElementById('ctrlCollapseBtn');
+    if (collapseBtn) {
+      const VERT_KEY = 'ih_ctrl_vertical';
+      // Restaurar preferencia
+      if (localStorage.getItem(VERT_KEY) === '1') ctrlEl.classList.add('ctrl-vertical');
+      collapseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVertical = ctrlEl.classList.toggle('ctrl-vertical');
+        try { localStorage.setItem(VERT_KEY, isVertical ? '1' : '0'); } catch(err) {}
+      });
+    }
+
     window.__refreshMiniCanvas = drawMini;
   })();
   //  El preload/stylesheet ya está en el <head>; aquí solo
