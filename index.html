@@ -3868,60 +3868,69 @@
   <!-- CONTROLES DE PARTÍCULAS -->
   <div class="controls" id="controls">
     <div class="controls-inner">
-    <div style="display:flex;align-items:center;flex-shrink:0;">
-      <div id="densityWrapper" style="display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width 0.35s ease,opacity 0.3s ease;">
-        <label for="density" style="font-size:11px;color:#aaa;white-space:nowrap;">Partículas</label>
-        <input type="range" id="density" min="20" max="400" value="200" style="width:90px;accent-color:#ccc;cursor:pointer;">
-        <span id="densityValue" style="font-size:11px;color:#ccc;min-width:26px;">200</span>
-      </div>
+    <!-- DENSIDAD -->
+    <div style="position:relative;flex-shrink:0;">
       <button class="toggle-btn" id="toggleDensity" title="Cantidad de partículas" style="width:26px;height:26px;border-radius:50%;border:1px solid #666;background:transparent;color:#ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.2s,color 0.2s,box-shadow 0.2s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="pointer-events:none;">
           <circle cx="5"  cy="12" r="2"/><circle cx="12" cy="5"  r="2"/><circle cx="19" cy="12" r="2"/>
           <circle cx="12" cy="19" r="2"/><circle cx="12" cy="12" r="1.2"/>
         </svg>
       </button>
+      <div id="densityPopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.7);z-index:200;white-space:nowrap;">
+        <div style="font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Partículas</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="density" min="20" max="400" value="200" style="width:110px;accent-color:#ccc;cursor:pointer;">
+          <span id="densityValue" style="font-size:11px;color:#ccc;min-width:30px;">200</span>
+        </div>
+      </div>
     </div>
     <!-- VELOCIDAD -->
-    <div style="display:flex;align-items:center;flex-shrink:0;">
-      <div id="speedWrapper" style="display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width 0.35s ease,opacity 0.3s ease;">
-        <label for="speedSlider" style="font-size:11px;color:#aaa;white-space:nowrap;">Velocidad</label>
-        <input type="range" id="speedSlider" min="0.1" max="10" step="0.1" value="1" style="width:90px;accent-color:#ccc;cursor:pointer;">
-        <span id="speedValue" style="font-size:11px;color:#ccc;min-width:26px;">x1</span>
-      </div>
+    <div style="position:relative;flex-shrink:0;">
       <button class="toggle-btn" id="toggleSpeed" title="Velocidad de partículas" style="width:26px;height:26px;border-radius:50%;border:1px solid #666;background:transparent;color:#ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.2s,color 0.2s,box-shadow 0.2s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
           <circle cx="12" cy="12" r="10"/>
           <polyline points="12 6 12 12 16 14"/>
         </svg>
       </button>
+      <div id="speedPopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.7);z-index:200;white-space:nowrap;">
+        <div style="font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Velocidad</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="speedSlider" min="0.1" max="10" step="0.1" value="1" style="width:110px;accent-color:#ccc;cursor:pointer;">
+          <span id="speedValue" style="font-size:11px;color:#ccc;min-width:26px;">x1</span>
+        </div>
+      </div>
     </div>
 
-    <!-- SLIDER TAMAÑO -->
-    <div style="display:flex;align-items:center;flex-shrink:0;">
-      <div id="sizeWrapper" style="display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width 0.35s ease,opacity 0.3s ease;">
-        <label for="sizeSlider" style="font-size:11px;color:#aaa;white-space:nowrap;">Tamaño</label>
-        <input type="range" id="sizeSlider" min="0.5" max="8" step="0.1" value="1" style="width:90px;accent-color:#ccc;cursor:pointer;">
-        <span id="sizeValue" style="font-size:11px;color:#ccc;min-width:26px;">x1</span>
-      </div>
+    <!-- TAMAÑO -->
+    <div style="position:relative;flex-shrink:0;">
       <button class="toggle-btn" id="toggleSize" title="Tamaño de partículas" style="width:26px;height:26px;border-radius:50%;border:1px solid #666;background:transparent;color:#ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.2s,color 0.2s,box-shadow 0.2s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
           <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
           <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
         </svg>
       </button>
+      <div id="sizePopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.7);z-index:200;white-space:nowrap;">
+        <div style="font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Tamaño</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="sizeSlider" min="0.5" max="8" step="0.1" value="1" style="width:110px;accent-color:#ccc;cursor:pointer;">
+          <span id="sizeValue" style="font-size:11px;color:#ccc;min-width:26px;">x1</span>
+        </div>
+      </div>
     </div>
 
-    <!-- BOTÓN OPACIDAD -->
-    <div style="display:flex;align-items:center;flex-shrink:0;">
-      <div id="opacityWrapper" style="display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width 0.35s ease,opacity 0.3s ease;">
-        <button id="particlesPowerBtn" title="Encender/apagar partículas" aria-pressed="true" style="width:20px;height:20px;border-radius:50%;border:1px solid #6bcb77;background:rgba(107,203,119,0.12);color:#6bcb77;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.25s,color 0.25s,background 0.25s;padding:0;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg>
-        </button>
-        <label for="opacitySlider" style="font-size:11px;color:#aaa;white-space:nowrap;">Opacidad</label>
-        <input type="range" id="opacitySlider" min="0.05" max="1" step="0.05" value="1" style="width:90px;accent-color:#ccc;cursor:pointer;">
-        <span id="opacityValue" style="font-size:11px;color:#ccc;min-width:26px;">100%</span>
-      </div>
+    <!-- OPACIDAD -->
+    <div style="position:relative;flex-shrink:0;">
       <button class="toggle-btn" id="toggleOpacity" title="Opacidad de partículas" style="width:26px;height:26px;border-radius:50%;border:1px solid #666;background:transparent;color:#ccc;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.2s,color 0.2s,box-shadow 0.2s;font-size:13px;line-height:1;">◑</button>
+      <div id="opacityPopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.7);z-index:200;white-space:nowrap;">
+        <div style="font-size:10px;color:#888;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Opacidad</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button id="particlesPowerBtn" title="Encender/apagar partículas" aria-pressed="true" style="width:20px;height:20px;border-radius:50%;border:1px solid #6bcb77;background:rgba(107,203,119,0.12);color:#6bcb77;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color 0.25s,color 0.25s,background 0.25s;padding:0;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg>
+          </button>
+          <input type="range" id="opacitySlider" min="0.05" max="1" step="0.05" value="1" style="width:90px;accent-color:#ccc;cursor:pointer;">
+          <span id="opacityValue" style="font-size:11px;color:#ccc;min-width:30px;">100%</span>
+        </div>
+      </div>
     </div>
 
     <!-- BOTÓN COLOR -->
@@ -3932,7 +3941,7 @@
         </svg>
       </button>
       <!-- POPOVER DE COLORES: un solo div que alterna entre vista "paleta" y vista "rueda" -->
-      <div id="colorPopover" style="display:none;position:absolute;bottom:38px;right:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;min-width:232px;box-shadow:0 4px 24px rgba(0,0,0,0.7);z-index:200;overflow:visible;">
+      <div id="colorPopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;min-width:232px;box-shadow:0 4px 24px rgba(0,0,0,0.7);z-index:200;overflow:visible;">
 
         <!-- ── VISTA PALETA ─────────────────────────── -->
         <div id="colorViewPalette">
@@ -4047,7 +4056,7 @@
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </button>
-      <div id="shapePopover" style="display:none;position:absolute;bottom:38px;right:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
+      <div id="shapePopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
 
         <!-- GRATIS -->
         <div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">○ Gratis</div>
@@ -4080,7 +4089,7 @@
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </button>
-      <div id="sharePopover" style="display:none;position:absolute;bottom:38px;right:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
+      <div id="sharePopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
 
         <!-- FILA 1: copiar código -->
         <div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;">Copiar código</div>
@@ -4551,10 +4560,9 @@
   // ── TOGGLE DENSIDAD ─────────────────────────────────────────
   (function() {
     const KEY_DENSITY = 'ih_particle_density';
-    // Sistema de cierre mutuo para sliders
     window.__sliderControls = window.__sliderControls || [];
 
-    const wrapper  = document.getElementById('densityWrapper');
+    const popover  = document.getElementById('densityPopover');
     const btn      = document.getElementById('toggleDensity');
     const slider   = document.getElementById('density');
     const valEl    = document.getElementById('densityValue');
@@ -4562,8 +4570,7 @@
 
     function closeSlider() {
       open = false;
-      wrapper.style.maxWidth = '0';
-      wrapper.style.opacity  = '0';
+      popover.style.display  = 'none';
       btn.style.borderColor  = '#666';
       btn.style.color        = '#ccc';
       btn.style.boxShadow    = 'none';
@@ -4590,13 +4597,14 @@
       window.__particlePopovers.forEach(p => p.close());
       if (!wasOpen) {
         open = true;
-        wrapper.style.maxWidth = '220px';
-        wrapper.style.opacity  = '1';
+        popover.style.display  = 'block';
         btn.style.borderColor  = '#fff';
         btn.style.color        = '#fff';
         btn.style.boxShadow    = '0 0 8px rgba(255,255,255,0.3)';
       }
     });
+
+    popover.addEventListener('click', e => e.stopPropagation());
 
     slider.addEventListener('input', (e) => {
       const v = parseInt(e.target.value, 10);
@@ -4956,15 +4964,14 @@
   // ── VELOCIDAD ────────────────────────────────────────────────
   (function() {
     const btn     = document.getElementById('toggleSpeed');
-    const wrapper = document.getElementById('speedWrapper');
+    const popover = document.getElementById('speedPopover');
     const slider  = document.getElementById('speedSlider');
     const valEl   = document.getElementById('speedValue');
     let open = false;
 
     function closeSlider() {
       open = false;
-      wrapper.style.maxWidth = '0';
-      wrapper.style.opacity  = '0';
+      popover.style.display  = 'none';
       btn.style.borderColor  = '#666';
       btn.style.color        = '#ccc';
       btn.style.boxShadow    = 'none';
@@ -4978,13 +4985,14 @@
       window.__particlePopovers.forEach(p => p.close());
       if (!wasOpen) {
         open = true;
-        wrapper.style.maxWidth = '220px';
-        wrapper.style.opacity  = '1';
+        popover.style.display  = 'block';
         btn.style.borderColor  = '#fff';
         btn.style.color        = '#fff';
         btn.style.boxShadow    = '0 0 8px rgba(255,255,255,0.3)';
       }
     });
+
+    popover.addEventListener('click', e => e.stopPropagation());
 
     slider.addEventListener('input', (e) => {
       particleSpeed = parseFloat(e.target.value);
@@ -5008,15 +5016,14 @@
   // ── TAMAÑO ───────────────────────────────────────────────────
   (function() {
     const btn     = document.getElementById('toggleSize');
-    const wrapper = document.getElementById('sizeWrapper');
+    const popover = document.getElementById('sizePopover');
     const slider  = document.getElementById('sizeSlider');
     const valEl   = document.getElementById('sizeValue');
     let open = false;
 
     function closeSlider() {
       open = false;
-      wrapper.style.maxWidth = '0';
-      wrapper.style.opacity  = '0';
+      popover.style.display  = 'none';
       btn.style.borderColor  = '#666';
       btn.style.color        = '#ccc';
       btn.style.boxShadow    = 'none';
@@ -5030,13 +5037,14 @@
       window.__particlePopovers.forEach(p => p.close());
       if (!wasOpen) {
         open = true;
-        wrapper.style.maxWidth = '220px';
-        wrapper.style.opacity  = '1';
+        popover.style.display  = 'block';
         btn.style.borderColor  = '#fff';
         btn.style.color        = '#fff';
         btn.style.boxShadow    = '0 0 8px rgba(255,255,255,0.3)';
       }
     });
+
+    popover.addEventListener('click', e => e.stopPropagation());
 
     slider.addEventListener('input', (e) => {
       particleSize = parseFloat(e.target.value);
@@ -5064,15 +5072,14 @@
   // ── OPACIDAD ─────────────────────────────────────────────────
   (function() {
     const btn     = document.getElementById('toggleOpacity');
-    const wrapper = document.getElementById('opacityWrapper');
+    const popover = document.getElementById('opacityPopover');
     const slider  = document.getElementById('opacitySlider');
     const valEl   = document.getElementById('opacityValue');
     let open = false;
 
     function closeSlider() {
       open = false;
-      wrapper.style.maxWidth = '0';
-      wrapper.style.opacity  = '0';
+      popover.style.display  = 'none';
       btn.style.borderColor  = '#666';
       btn.style.color        = '#ccc';
       btn.style.boxShadow    = 'none';
@@ -5086,13 +5093,14 @@
       window.__particlePopovers.forEach(p => p.close());
       if (!wasOpen) {
         open = true;
-        wrapper.style.maxWidth = '220px';
-        wrapper.style.opacity  = '1';
+        popover.style.display  = 'block';
         btn.style.borderColor  = '#fff';
         btn.style.color        = '#fff';
         btn.style.boxShadow    = '0 0 8px rgba(255,255,255,0.3)';
       }
     });
+
+    popover.addEventListener('click', e => e.stopPropagation());
 
     slider.addEventListener('input', (e) => {
       particleOpacity = parseFloat(e.target.value);
