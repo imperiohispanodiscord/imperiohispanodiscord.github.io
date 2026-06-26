@@ -802,20 +802,6 @@
   }
 
   /* Mini-canvas — siempre visible a la izquierda */
-  #ctrlMiniCanvas {
-    display: block;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.25);
-    flex-shrink: 0;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    background: transparent;
-  }
-  #ctrlMiniCanvas:hover { border-color: rgba(255,255,255,0.55); }
-  body.light-mode #ctrlMiniCanvas { border-color: rgba(0,0,0,0.2); }
-  body.light-mode #ctrlMiniCanvas:hover { border-color: rgba(0,0,0,0.45); }
 
   /* Botón flecha */
   #ctrlCollapseBtn {
@@ -854,6 +840,18 @@
   }
   /* En vertical la flecha rota 90° */
   .controls.ctrl-vertical #ctrlCollapseBtn svg { transform: rotate(90deg); }
+
+  /* En vertical los popovers abren a la derecha, no hacia abajo */
+  .controls.ctrl-vertical #densityPopover,
+  .controls.ctrl-vertical #speedPopover,
+  .controls.ctrl-vertical #sizePopover,
+  .controls.ctrl-vertical #opacityPopover,
+  .controls.ctrl-vertical #colorPopover,
+  .controls.ctrl-vertical #shapePopover,
+  .controls.ctrl-vertical #sharePopover {
+    top: 0 !important;
+    left: calc(100% + 8px) !important;
+  }
 
 
 
@@ -1874,10 +1872,6 @@
       <span class="dot-online"></span>
       <strong id="membersOnline">—</strong>
       <span>en línea</span>
-      <span class="sep">·</span>
-      <span class="dot-total"></span>
-      <strong id="membersTotal">—</strong>
-      <span>miembros</span>
     </div>
 
     <div class="btn-header-group">
@@ -2660,7 +2654,7 @@
       </a>
     </div>
     <p>© 2025 – 2026 Imperio Hispano &mdash; Todos los derechos reservados</p>
-    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.13</span></p>
+    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.14</span></p>
     <!-- BOTONES FOOTER -->
     <div style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button id="privacyToggleBtn" aria-expanded="false" aria-controls="privacyNote"
@@ -2881,7 +2875,7 @@
         <div class="priv-note" style="margin-top:10px;">Mantén el botón pulsado hasta que se complete para confirmar.</div>
 
         <!-- Fecha revisión -->
-        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.13</div>
+        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.14</div>
       </div>
 
       <script>
@@ -3267,15 +3261,31 @@
         <!-- Timeline -->
         <div class="cl-timeline">
 
-          <!-- 25 JUN 2026 — v1.13 -->
+          <!-- 26 JUN 2026 — v1.14 -->
           <div class="cl-day">
             <div class="cl-day-header">
               <div class="cl-day-dot" id="cl-latest-dot"></div>
+              <span class="cl-day-label">26 JUN 2026</span>
+              <span class="cl-version-tag">v1.14</span>
+              <span id="cl-new-badge-auto"></span>
+              <span class="cl-day-count">3 cambios</span>
+              <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
+            </div>
+            <div class="cl-day-body">
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Eliminado CSS antiguo de <code>#ctrlMiniCanvas</code> con <code>border: 1px solid</code> que sobreescribía el estilo correcto del botón del menú de partículas. Ahora el botón muestra solo la partícula activa, sin el círculo fino.</span></div>
+              <div class="cl-item"><div class="cl-dot medium"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Todos los submenús del menú de partículas (color, forma, compartir, densidad, velocidad, tamaño y opacidad) ahora se abren hacia abajo en modo horizontal y hacia la derecha en modo vertical, evitando que tapen otros botones.</span></div>
+              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">UI</span><span class="cl-text">Contador de miembros en línea: sustituida la llamada a la API de invites (bloqueada por CORS) por el widget oficial de Discord (<code>guilds/ID/widget.json</code>). Ahora el número de miembros en línea se carga correctamente en producción.</span></div>
+            </div>
+          </div>
+
+          <!-- 25 JUN 2026 — v1.13 -->
+          <div class="cl-day collapsed">
+            <div class="cl-day-header">
+              <div class="cl-day-dot"></div>
               <span class="cl-day-label">25 JUN 2026</span>
               <span class="cl-version-tag">v1.13</span>
-              <span id="cl-new-badge-auto"></span>
               <span class="cl-day-count">5 cambios</span>
-              <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
+              <button class="cl-collapse-btn" aria-label="Expandir día">▾</button>
             </div>
             <div class="cl-day-body">
               <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">UI</span><span class="cl-text">Menú de partículas rediseñado: eliminada la barra fija inferior. Ahora un botón circular fijo arriba a la izquierda muestra la partícula activa como icono y despliega el menú justo debajo al pulsarlo, con animación de fade. La flecha interior alterna entre disposición horizontal y vertical para no tapar contenido.</span></div>
@@ -3941,7 +3951,7 @@
         </svg>
       </button>
       <!-- POPOVER DE COLORES: un solo div que alterna entre vista "paleta" y vista "rueda" -->
-      <div id="colorPopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;min-width:232px;box-shadow:0 4px 24px rgba(0,0,0,0.7);z-index:200;overflow:visible;">
+      <div id="colorPopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;min-width:232px;box-shadow:0 4px 24px rgba(0,0,0,0.7);z-index:200;overflow:visible;">
 
         <!-- ── VISTA PALETA ─────────────────────────── -->
         <div id="colorViewPalette">
@@ -4056,7 +4066,7 @@
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       </button>
-      <div id="shapePopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
+      <div id="shapePopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
 
         <!-- GRATIS -->
         <div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase;">○ Gratis</div>
@@ -4089,7 +4099,7 @@
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </button>
-      <div id="sharePopover" style="display:none;position:absolute;top:0;left:calc(100% + 8px);background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
+      <div id="sharePopover" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:rgba(10,10,10,0.95);border:1px solid #444;border-radius:10px;padding:12px 14px;white-space:nowrap;min-width:260px;box-shadow:0 4px 20px rgba(0,0,0,0.6);z-index:200;">
 
         <!-- FILA 1: copiar código -->
         <div style="font-size:10px;color:#888;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase;">Copiar código</div>
@@ -6686,22 +6696,20 @@
     if (!badge || !elOnline || !elTotal) return;
 
     try {
-      const res  = await fetch('https://discord.com/api/v10/invites/YAF9zy9UJc?with_counts=true');
-      if (!res.ok) throw new Error('Discord API error');
+      const res  = await fetch('https://discord.com/api/guilds/1446909291968729160/widget.json');
+      if (!res.ok) throw new Error('Discord widget error');
       const data = await res.json();
 
-      const online = data.approximate_presence_count ?? 0;
-      const total  = data.approximate_member_count   ?? 0;
+      const online = data.presence_count ?? 0;
 
       elOnline.classList.remove('skeleton');
       elTotal.classList.remove('skeleton');
       countUp(elOnline, online, 1000);
-      countUp(elTotal,  total,  1400);
+      elTotal.textContent = '—';
     } catch (e) {
-      // Si la API falla (CORS en local), mostramos — como fallback
       if (elOnline) { elOnline.classList.remove('skeleton'); elOnline.textContent = '—'; }
       if (elTotal)  { elTotal.classList.remove('skeleton');  elTotal.textContent  = '—'; }
-      console.warn('[IH] Discord members fetch failed (normal en local):', e.message);
+      console.warn('[IH] Discord widget fetch failed:', e.message);
     }
   })();
 
