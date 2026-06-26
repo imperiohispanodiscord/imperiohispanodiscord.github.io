@@ -3035,13 +3035,38 @@
              Los puntos .cl-day-dot se superponen encima con z-index.
           ────────────────────────────────────────────────────────── */
           .cl-timeline::before {
+            content: none;
+          }
+
+          /* Línea vertical: parte del primer punto hasta el último */
+          .cl-day:first-child::before {
             content: '';
             position: absolute;
-            left: 9px;             /* padding-left(28) - 19px = 9px desde el borde del contenedor */
-            top: 5px;
-            bottom: 5px;
+            left: -19px;
+            top: 10px;
             width: 1px;
+            bottom: calc(-28px - 100%);
             background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+            pointer-events: none;
+          }
+          .cl-day:not(:first-child):not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 0;
+            width: 1px;
+            bottom: -28px;
+            background: #2a2a2a;
+            pointer-events: none;
+          }
+          .cl-day:last-child::before {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 0;
+            width: 1px;
+            height: 10px;
+            background: #2a2a2a;
             pointer-events: none;
           }
 
@@ -3268,13 +3293,15 @@
               <span class="cl-day-label">26 JUN 2026</span>
               <span class="cl-version-tag">v1.14</span>
               <span id="cl-new-badge-auto"></span>
-              <span class="cl-day-count">3 cambios</span>
+              <span class="cl-day-count">5 cambios</span>
               <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
             </div>
             <div class="cl-day-body">
               <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Eliminado CSS antiguo de <code>#ctrlMiniCanvas</code> con <code>border: 1px solid</code> que sobreescribía el estilo correcto del botón del menú de partículas. Ahora el botón muestra solo la partícula activa, sin el círculo fino.</span></div>
               <div class="cl-item"><div class="cl-dot medium"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Todos los submenús del menú de partículas (color, forma, compartir, densidad, velocidad, tamaño y opacidad) ahora se abren hacia abajo en modo horizontal y hacia la derecha en modo vertical, evitando que tapen otros botones.</span></div>
               <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">UI</span><span class="cl-text">Contador de miembros en línea: sustituida la llamada a la API de invites (bloqueada por CORS) por el widget oficial de Discord (<code>guilds/ID/widget.json</code>). Ahora el número de miembros en línea se carga correctamente en producción.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge ui">UI</span><span class="cl-text">Eliminado el contador de total de miembros de la cabecera. El widget de Discord solo proporciona miembros en línea, por lo que mostrar el total no era posible sin una dependencia externa.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Línea vertical del changelog: corregido el recorte que impedía que llegase hasta la última entrada al hacer scroll. La línea ahora está definida por <code>::before</code> en cada <code>.cl-day</code> en vez del contenedor, por lo que recorre todo el contenido independientemente del scroll.</span></div>
             </div>
           </div>
 
@@ -6690,10 +6717,8 @@
   //  CONTADOR DE MIEMBROS DE DISCORD EN VIVO
   // ══════════════════════════════════════════════════════════════
   (async function loadDiscordMembers() {
-    const badge   = document.getElementById('membersBadge');
-    const elOnline= document.getElementById('membersOnline');
-    const elTotal = document.getElementById('membersTotal');
-    if (!badge || !elOnline || !elTotal) return;
+    const elOnline = document.getElementById('membersOnline');
+    if (!elOnline) return;
 
     try {
       const res  = await fetch('https://discord.com/api/guilds/1446909291968729160/widget.json');
@@ -6701,14 +6726,10 @@
       const data = await res.json();
 
       const online = data.presence_count ?? 0;
-
       elOnline.classList.remove('skeleton');
-      elTotal.classList.remove('skeleton');
       countUp(elOnline, online, 1000);
-      elTotal.textContent = '—';
     } catch (e) {
       if (elOnline) { elOnline.classList.remove('skeleton'); elOnline.textContent = '—'; }
-      if (elTotal)  { elTotal.classList.remove('skeleton');  elTotal.textContent  = '—'; }
       console.warn('[IH] Discord widget fetch failed:', e.message);
     }
   })();
