@@ -6745,7 +6745,7 @@
     if (!elOnline) return;
 
     try {
-      const { data, error } = await window.__SB_CLIENT
+      const { data, error } = await db
         .from('counters')
         .select('online_members, total_members')
         .eq('name', 'discord_stats')
