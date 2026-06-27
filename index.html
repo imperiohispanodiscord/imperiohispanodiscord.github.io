@@ -1870,8 +1870,12 @@
     </div>
     <div class="members-badge" id="membersBadge">
       <span class="dot-online"></span>
-      <strong id="membersOnline">—</strong>
+      <strong id="membersOnline" class="skeleton">—</strong>
       <span>en línea</span>
+      <span class="sep">·</span>
+      <span class="dot-total"></span>
+      <strong id="membersTotal" class="skeleton">—</strong>
+      <span>miembros</span>
     </div>
 
     <div class="btn-header-group">
@@ -2654,7 +2658,7 @@
       </a>
     </div>
     <p>© 2025 – 2026 Imperio Hispano &mdash; Todos los derechos reservados</p>
-    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.14</span></p>
+    <p style="margin-top:6px; font-size:12px;">Construido con orgullo hispano. &nbsp;<span style="opacity:0.35;letter-spacing:1px;">v1.15</span></p>
     <!-- BOTONES FOOTER -->
     <div style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button id="privacyToggleBtn" aria-expanded="false" aria-controls="privacyNote"
@@ -2875,7 +2879,7 @@
         <div class="priv-note" style="margin-top:10px;">Mantén el botón pulsado hasta que se complete para confirmar.</div>
 
         <!-- Fecha revisión -->
-        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.14</div>
+        <div class="priv-date">Última revisión: junio 2026 &nbsp;·&nbsp; v1.15</div>
       </div>
 
       <script>
@@ -3286,15 +3290,34 @@
         <!-- Timeline -->
         <div class="cl-timeline">
 
-          <!-- 26 JUN 2026 — v1.14 -->
+          <!-- 27 JUN 2026 — v1.15 -->
           <div class="cl-day">
             <div class="cl-day-header">
               <div class="cl-day-dot" id="cl-latest-dot"></div>
+              <span class="cl-day-label">27 JUN 2026</span>
+              <span class="cl-version-tag">v1.15</span>
+              <span id="cl-new-badge-auto"></span>
+              <span class="cl-day-count">6 cambios</span>
+              <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
+            </div>
+            <div class="cl-day-body">
+              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge deploy">Deploy</span><span class="cl-text">Bot <strong>CASTILLO#3319</strong> creado y desplegado en Railway 24/7. Monitoriza el servidor de Discord cada 10 minutos y guarda los datos en Supabase: miembros en línea y total de miembros.</span></div>
+              <div class="cl-item"><div class="cl-dot high"></div><span class="cl-badge ui">UI</span><span class="cl-text">Contadores de la cabecera actualizados: ahora leen directamente de Supabase en vez de llamar a la API de Discord. Se muestran tanto los miembros en línea como el total, ambos proporcionados por el bot.</span></div>
+              <div class="cl-item"><div class="cl-dot medium"></div><span class="cl-badge js">JS</span><span class="cl-text">Añadidos comandos de barra <code>/stats</code> y <code>/ping</code> al bot: <code>/stats</code> muestra un embed con miembros en línea y total del servidor; <code>/ping</code> muestra la latencia del bot en milisegundos.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Eliminados todos los comandos del bot anterior que seguían registrados en Discord. Los nuevos comandos <code>/stats</code> y <code>/ping</code> sincronizados correctamente con el servidor.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge seg">Seg</span><span class="cl-text">Políticas RLS de Supabase actualizadas para permitir escritura del bot en la tabla <code>counters</code>. Añadidas columnas <code>online_members</code> y <code>total_members</code> a la tabla.</span></div>
+              <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Línea vertical del changelog corregida: ahora se construye con <code>::before</code> en cada <code>.cl-day</code> en vez del contenedor, por lo que llega hasta la última entrada independientemente del scroll.</span></div>
+            </div>
+          </div>
+
+          <!-- 26 JUN 2026 — v1.14 -->
+          <div class="cl-day collapsed">
+            <div class="cl-day-header">
+              <div class="cl-day-dot"></div>
               <span class="cl-day-label">26 JUN 2026</span>
               <span class="cl-version-tag">v1.14</span>
-              <span id="cl-new-badge-auto"></span>
               <span class="cl-day-count">5 cambios</span>
-              <button class="cl-collapse-btn" aria-label="Colapsar día">▾</button>
+              <button class="cl-collapse-btn" aria-label="Expandir día">▾</button>
             </div>
             <div class="cl-day-body">
               <div class="cl-item"><div class="cl-dot low"></div><span class="cl-badge fix">Fix</span><span class="cl-text">Eliminado CSS antiguo de <code>#ctrlMiniCanvas</code> con <code>border: 1px solid</code> que sobreescribía el estilo correcto del botón del menú de partículas. Ahora el botón muestra solo la partícula activa, sin el círculo fino.</span></div>
@@ -6718,19 +6741,31 @@
   // ══════════════════════════════════════════════════════════════
   (async function loadDiscordMembers() {
     const elOnline = document.getElementById('membersOnline');
+    const elTotal  = document.getElementById('membersTotal');
     if (!elOnline) return;
 
     try {
-      const res  = await fetch('https://discord.com/api/guilds/1446909291968729160/widget.json');
-      if (!res.ok) throw new Error('Discord widget error');
-      const data = await res.json();
+      const { data, error } = await window.__SB_CLIENT
+        .from('counters')
+        .select('online_members, total_members')
+        .eq('name', 'discord_stats')
+        .single();
 
-      const online = data.presence_count ?? 0;
+      if (error || !data) throw new Error('Supabase error');
+
+      const online = data.online_members ?? 0;
+      const total  = data.total_members  ?? 0;
+
       elOnline.classList.remove('skeleton');
       countUp(elOnline, online, 1000);
+      if (elTotal) {
+        elTotal.classList.remove('skeleton');
+        countUp(elTotal, total, 1400);
+      }
     } catch (e) {
       if (elOnline) { elOnline.classList.remove('skeleton'); elOnline.textContent = '—'; }
-      console.warn('[IH] Discord widget fetch failed:', e.message);
+      if (elTotal)  { elTotal.classList.remove('skeleton');  elTotal.textContent  = '—'; }
+      console.warn('[IH] Members fetch failed:', e.message);
     }
   })();
 
